@@ -1,0 +1,91 @@
+# data analysis
+
+library(tidyverse)
+getwd()
+gapminder_data <- read_csv("data/gapminder_data.csv")
+
+# get stats fast
+# summarize gives us a small data frame first word in the parenthesis is the title for that column
+summarise(gapminder_data, averageLifeExp=mean(lifeExp), medianLifeExp=median(lifeExp))
+
+# Learning to pipe
+# First argument is what you pipe into it
+# You can pipe multiple functions together
+# To save the output, we need to assign it to an object, right now its just printing it
+
+gapminder_summary<-gapminder_data%>%
+  summarize(averageLifeExp=mean(lifeExp))
+gapminder_summary
+
+# Filtering
+# == logical operator
+# != exception
+gapminder_summary_2007<-gapminder_data%>%
+  filter(year == 2007)%>%
+  summarize(average = mean(lifeExp))
+
+# Finding average gdpPercap for the first year of the dataset
+gapminder_data %>%
+  summarize(first_year=min(year))
+
+gapminder_data%>%
+  filter(year == 1952)%>%
+  summarize(average = mean(gdpPercap))
+
+gapminder_data%>%
+  filter(year == min(year))%>%
+  summarize(average = mean(gdpPercap))
+
+# Using group_by()
+# Find statistics behind specific groups
+
+gapminder_data%>%
+  group_by(year)%>%
+  summarize(average=mean(lifeExp))
+
+gapminder_data%>%
+  group_by(continent)%>%
+  summarize(average=mean(lifeExp))
+
+gapminder_data%>%
+  group_by(year,continent)%>%
+  summarize(average=mean(lifeExp))
+
+gapminder_data%>%
+  group_by(year,continent)%>%
+  summarize(average=mean(lifeExp), 
+            error =sd(lifeExp))
+
+# Mutate function
+# Create a new column as a result of other columns
+
+gapminder_data%>%
+  mutate(gdp = pop * gdpPercap)
+
+# Mutate a new column which is a population in millions 
+# Mutate doesn't change an object, to save it, you need to assign it into a new object 
+
+gapminder_data%>%
+  mutate(popInMillion = pop/1000000)
+
+# Select
+# keep population and year
+gapminder_data%>%
+  select(pop, year)
+
+# Remove a specific column
+gapminder_data%>%
+  select(-continent)
+
+gapminder_data%>%
+  select(-continent, -pop)
+
+# We normally format data in a *wide format*, but R doesn't like that, it uses *long format*
+# long format: every row is a single observation
+
+# Pivot_wider
+# Makes data easier for humans to read
+gapminder_data%>%
+  select(country, continent, year, lifeExp)%>%
+  pivot_wider(names_from = year, values_from = lifeExp)%>%
+  View()
