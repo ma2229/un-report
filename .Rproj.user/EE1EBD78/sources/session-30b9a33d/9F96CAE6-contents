@@ -89,3 +89,61 @@ gapminder_data%>%
   select(country, continent, year, lifeExp)%>%
   pivot_wider(names_from = year, values_from = lifeExp)%>%
   View()
+
+# Messy Data :)
+# You are responsible for the quality of data you provide R
+
+read_csv("co2-un-data.csv")
+
+#With messy data is better to assign to an object once its formatted
+# in R fuctions separate arguments with commas, to give it a list, we need to use the command concatenate, to make it one piece of information that goes to the col_names argument.
+read_csv("co2-un-data.csv", skip = 1)
+
+read_csv("co2-un-data.csv", skip = 2,
+         col_names = c("region", "country", "year", "series", "value", "footnotes", "source"))
+
+co2_emissions_dirty <- read_csv("co2-un-data.csv", skip = 2,
+                                col_names = c("region", "country", "year", "series", "value", "footnotes", "source"))
+#Separate series into the 2 different units
+#We used mutate to create a new column, but by using the same name as the old column it gets replaced
+
+co2_emissions_dirty%>%
+  select(country, year, series, value)%>%
+  mutate(series = recode(series, "Emissions (thousand metric tons of carbon dioxide)" = "total_emissions", "Emissions per capita (metric tons of carbon dioxide)" = "per_capita_emissions"))%>%
+  pivot_wider(names_from = series, values_from = value)
+
+co2_emissions_dirty2<-co2_emissions_dirty%>%
+  select(country, year, series, value)%>%
+  mutate(series = recode(series, "Emissions (thousand metric tons of carbon dioxide)" = "total_emissions", "Emissions per capita (metric tons of carbon dioxide)" = "per_capita_emissions"))%>%
+  pivot_wider(names_from = series, values_from = value)
+
+co2_emissions_dirty2
+
+# Filter for year 2005
+# Select to remove the year column
+
+co2_emissions_dirty2%>%
+filter (year == 2005)%>%
+  select (-year)
+
+co2_emissions<-co2_emissions_dirty2%>%
+  filter (year == 2005)%>%
+  select (-year)  
+
+co2_emissions
+
+#Bringing in 2007 Population Data
+
+gapminder_data_2007<-read_csv("data/gapminder_data.csv")%>%
+  filter (year == 2007)%>%
+  select (country, pop, lifeExp, gdpPercap)
+
+gapminder_data_2007
+# Join data frames
+
+inner_join(co2_emissions, gapminder_data_2007)
+
+anti_join(co2_emissions, gapminder_data_2007)
+anti_join(gapminder_data_2007, co2_emissions)
+
+full_join(co2_emissions, gapminder_data_2007)
