@@ -147,3 +147,13 @@ anti_join(co2_emissions, gapminder_data_2007)
 anti_join(gapminder_data_2007, co2_emissions)
 
 full_join(co2_emissions, gapminder_data_2007)
+
+anti_join(gapminder_data, co2_emissions, by="country")
+
+joined_co2_pop<-inner_join(co2_emissions, gapminder_data_2007)
+
+#Writing a CSV
+
+write_csv(joined_co2_pop, file = "data/joined_co2_pop.csv")
+
+#Find relationship between CO2 and GDP
